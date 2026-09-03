@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcart-cart-deployment
+  labels:
+    app.kubernetes.io/name: cart-deployment
+    app.kubernetes.io/instance: cloudcart-cart-deployment
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cart
+      app.kubernetes.io/instance: cloudcart-cart
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cart
+        app.kubernetes.io/instance: cloudcart-cart
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: cloudcart
+        app.kubernetes.io/managed-by: kubectl
+    spec:
+      containers:
+        - name: cloudcart-cart-container
+          image: public.ecr.aws/k3e1b3j2/cloudcart/cart:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_URL
+                  name: cloudcart-configmap
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

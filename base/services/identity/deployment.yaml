@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcart-identity-deployment
+  labels:
+    app.kubernetes.io/name: identity-deployment
+    app.kubernetes.io/instance: cloudcart-identity-deployment
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: identity
+      app.kubernetes.io/instance: cloudcart-identity
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: identity
+        app.kubernetes.io/instance: cloudcart-identity
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: cloudcart
+        app.kubernetes.io/managed-by: kubectl
+    spec:
+      containers:
+        - name: cloudcart-identity-container
+          image: public.ecr.aws/k3e1b3j2/cloudcart/identity:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cloudcart-secret
+                  key: DATABASE_URL
+            - name: REDIS_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_URL
+                  name: cloudcart-configmap
+            - name: SESSION_COOKIE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: SESSION_COOKIE_NAME
+                  name: cloudcart-configmap
+            - name: SESSION_COOKIE_SECURE
+              valueFrom:
+                configMapKeyRef:
+                  key: SESSION_COOKIE_SECURE
+                  name: cloudcart-configmap
+            - name: SESSION_TTL_SECONDS
+              valueFrom:
+                configMapKeyRef:
+                  key: SESSION_TTL_SECONDS
+                  name: cloudcart-configmap
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  key: ENVIRONMENT
+                  name: cloudcart-configmap
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

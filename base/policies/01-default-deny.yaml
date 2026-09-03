@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  labels:
+    app.kubernetes.io/name: default-deny
+    app.kubernetes.io/instance: cloudcart-default-deny
+    app.kubernetes.io/component: network-policy
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

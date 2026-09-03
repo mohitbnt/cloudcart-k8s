@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gateway-netpol
+  labels:
+    app.kubernetes.io/name: gateway-netpol
+    app.kubernetes.io/instance: cloudcart-gateway-netpol
+    app.kubernetes.io/component: network-policy
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: gateway
+      app.kubernetes.io/instance: cloudcart-gateway
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+              app.kubernetes.io/instance: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+              app.kubernetes.io/instance: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog
+              app.kubernetes.io/instance: cloudcart-catalog
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: identity
+              app.kubernetes.io/instance: cloudcart-identity
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: cart
+              app.kubernetes.io/instance: cloudcart-cart
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: order
+              app.kubernetes.io/instance: cloudcart-order
+      ports:
+        - protocol: TCP
+          port: 8000

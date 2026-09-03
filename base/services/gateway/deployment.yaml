@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcart-gateway-deployment
+  labels:
+    app.kubernetes.io/name: gateway-deployment
+    app.kubernetes.io/instance: cloudcart-gateway-deployment
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gateway
+      app.kubernetes.io/instance: cloudcart-gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: gateway
+        app.kubernetes.io/instance: cloudcart-gateway
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: cloudcart
+        app.kubernetes.io/managed-by: kubectl
+    spec:
+      containers:
+        - name: cloudcart-gateway-container
+          image: public.ecr.aws/k3e1b3j2/cloudcart/gateway:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          env:
+            - name: CATALOG_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: CATALOG_URL
+                  name: cloudcart-configmap
+            - name: IDENTITY_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: IDENTITY_URL
+                  name: cloudcart-configmap
+            - name: CART_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: CART_URL
+                  name: cloudcart-configmap 
+            - name: ORDER_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: ORDER_URL
+                  name: cloudcart-configmap
+            - name: NOTIFICATION_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: NOTIFICATION_URL
+                  name: cloudcart-configmap
+            - name: ALLOWED_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  key: ALLOWED_ORIGINS
+                  name: cloudcart-configmap
+            - name: INVENTORY_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: INVENTORY_URL
+                  name: cloudcart-configmap
+            - name: PAYMENT_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: PAYMENT_URL
+                  name: cloudcart-configmap
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

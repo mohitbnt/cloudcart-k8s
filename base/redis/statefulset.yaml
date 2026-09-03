@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cloudcart-redis-statefulset
+  labels:
+    app.kubernetes.io/name: redis-statefulset
+    app.kubernetes.io/instance: cloudcart-redis-statefulset
+    app.kubernetes.io/component: cache
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  serviceName: cloudcart-redis-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/instance: cloudcart-redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/instance: cloudcart-redis
+        app.kubernetes.io/component: cache
+        app.kubernetes.io/part-of: cloudcart
+        app.kubernetes.io/managed-by: kubectl
+    spec:
+      containers:
+        - name: cloudcart-redis-container
+          image: redis:7-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 6379
+          command:
+            - redis-server
+            - "--appendonly"
+            - "yes"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: cloudcart-redis-volume
+              mountPath: /data
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec redis-cli ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec redis-cli ping
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec redis-cli ping
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: cloudcart-redis-volume
+      spec:
+        storageClassName: local-storage-custom
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi

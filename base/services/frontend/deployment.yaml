@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudcart-frontend-deployment
+  labels:
+    app.kubernetes.io/name: frontend-deployment
+    app.kubernetes.io/instance: cloudcart-frontend-deployment
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+      app.kubernetes.io/instance: cloudcart-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: frontend
+        app.kubernetes.io/instance: cloudcart-frontend
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: cloudcart
+        app.kubernetes.io/managed-by: kubectl
+    spec:
+      containers:
+        - name: cloudcart-frontend-container
+          image: public.ecr.aws/k3e1b3j2/cloudcart/frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: API_BASE
+              valueFrom:
+                configMapKeyRef:
+                  key: API_BASE
+                  name: cloudcart-configmap
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

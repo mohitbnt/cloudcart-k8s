@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudcart-ingress
+  labels:
+    app.kubernetes.io/name: ingress
+    app.kubernetes.io/instance: cloudcart-ingress
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - shop.cloudsystemonline.com
+        - api.cloudsystemonline.com
+      secretName: tls-cloudsytemonline.com
+  rules:
+    - host: shop.cloudsystemonline.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cloudcart-frontend-service
+                port:
+                  number: 80
+    - host: api.cloudsystemonline.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cloudcart-gateway-service
+                port:
+                  number: 8000

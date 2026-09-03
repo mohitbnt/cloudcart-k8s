@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: payment-netpol
+  labels:
+    app.kubernetes.io/name: payment-netpol
+    app.kubernetes.io/instance: cloudcart-payment-netpol
+    app.kubernetes.io/component: network-policy
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: payment
+      app.kubernetes.io/instance: cloudcart-payment
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: order
+              app.kubernetes.io/instance: cloudcart-order
+      ports:
+        - protocol: TCP
+          port: 8000
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+              app.kubernetes.io/instance: cloudcart-postgresql
+      ports:
+        - protocol: TCP
+          port: 5432

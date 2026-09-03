@@ -1,0 +1,28 @@
+# Kubernetes secrets / credentials
+secret.yaml
+secret.yml
+*.secret.yaml
+*.secret.yml
+
+# Local environment files
+.env
+.env.*
+
+# Keep example environment files
+!.env.example
+
+# Local Kubernetes artifacts
+*.kubeconfig
+kubeconfig
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.log

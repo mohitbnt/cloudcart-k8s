@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-netpol
+  labels:
+    app.kubernetes.io/name: redis-netpol
+    app.kubernetes.io/instance: cloudcart-redis-netpol
+    app.kubernetes.io/component: network-policy
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+  namespace: cloudcart
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/instance: cloudcart-redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: identity
+              app.kubernetes.io/instance: cloudcart-identity
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: cart
+              app.kubernetes.io/instance: cloudcart-cart
+      ports:
+        - protocol: TCP
+          port: 6379

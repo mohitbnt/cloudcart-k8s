@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudcart-configmap
+  namespace: cloudcart
+  labels:
+    app.kubernetes.io/name: cloudcart
+    app.kubernetes.io/instance: cloudcart-configmap
+    app.kubernetes.io/component: configmap
+    app.kubernetes.io/part-of: cloudcart
+    app.kubernetes.io/managed-by: kubectl
+data:
+  REDIS_URL: redis://cloudcart-redis-service:6379/0
+  CATALOG_URL: http://cloudcart-catalog-service:8000
+  IDENTITY_URL: http://cloudcart-identity-service:8000
+  CART_URL: http://cloudcart-cart-service:8000
+  ORDER_URL: http://cloudcart-order-service:8000
+  INVENTORY_URL: http://cloudcart-inventory-service:8000
+  PAYMENT_URL: http://cloudcart-payment-service:8000
+  NOTIFICATION_URL: http://cloudcart-notification-service:8000
+  SESSION_TTL_SECONDS: "86400"
+  SESSION_COOKIE_NAME: cloudcart_session
+  SESSION_COOKIE_SECURE: "false"
+  ENVIRONMENT: production
+  API_BASE: https://api.cloudsystemonline.com
+  ALLOWED_ORIGINS: https://shop.cloudsystemonline.com
