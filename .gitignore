@@ -1,5 +1,5 @@
 # Kubernetes secrets / credentials
-secret.yaml
+*secret.yaml
 secret.yml
 *.secret.yaml
 *.secret.yml
