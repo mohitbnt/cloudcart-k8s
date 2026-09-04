@@ -4,7 +4,6 @@ CloudCart is a production-like e-commerce microservices application deployed on 
 
 This repository focuses on the **Kubernetes platform and operational configuration** around CloudCart. The application itself is included under `cloudcart-application/` as the workload used to exercise Kubernetes concepts.
 
-> **Current scope:** Local Kubernetes only. Cloud/EKS, Terraform, Argo CD, Prometheus, Grafana, and other cloud/platform extensions are intentionally outside the scope of this repository for now.
 
 ## Architecture
 
@@ -614,20 +613,6 @@ This separation keeps CloudCart useful as a Kubernetes and DevOps platform proje
 - [x] Horizontal Pod Autoscaling
 - [x] Application verification
 - [x] NetworkPolicy validation and correction
-
-## Intentionally Outside Current Scope
-
-- Cloud infrastructure
-- EKS
-- Terraform
-- Argo CD
-- Prometheus
-- Grafana
-- Alertmanager
-- Cloud-native load balancers
-- Managed database/cache services
-
-These belong to later stages of the broader CloudCart DevOps journey and are not part of this local Kubernetes repository's current implementation.
 
 # Design Principles
 
