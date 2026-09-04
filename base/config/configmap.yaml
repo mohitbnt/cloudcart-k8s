@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: cloudcart-configmap
     app.kubernetes.io/component: configmap
     app.kubernetes.io/part-of: cloudcart
-    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/managed-by: kustomize
 data:
   REDIS_URL: redis://cloudcart-redis-service:6379/0
   CATALOG_URL: http://cloudcart-catalog-service:8000

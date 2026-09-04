@@ -1,8 +1,9 @@
 # Kubernetes secrets / credentials
 *secret.yaml
-secret.yml
 *.secret.yaml
 *.secret.yml
+secret*.yaml
+secret*.yml
 
 # Local environment files
 .env

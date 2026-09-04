@@ -1,0 +1,47 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: cloudcart-dev
+
+resources:
+  - ../../base
+
+patches:
+  - path: namespace-patch.yaml
+  - path: configmap-patch.yaml
+  - path: secret-patch.yaml
+  
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: cloudcart-ingress
+    path: ingress-patch.yaml
+
+images:
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/catalog
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/identity
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/cart
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/inventory
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/order
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/payment
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/notification
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/gateway
+    newTag: dev-1.0.0
+
+  - name: public.ecr.aws/k3e1b3j2/cloudcart/frontend
+    newTag: dev-1.0.0

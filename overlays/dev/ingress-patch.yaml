@@ -1,0 +1,15 @@
+- op: replace
+  path: /spec/tls/0/hosts/0
+  value: devshop.cloudsystemonline.com
+
+- op: replace
+  path: /spec/tls/0/hosts/1
+  value: devapi.cloudsystemonline.com
+
+- op: replace
+  path: /spec/rules/0/host
+  value: devshop.cloudsystemonline.com
+
+- op: replace
+  path: /spec/rules/1/host
+  value: devapi.cloudsystemonline.com

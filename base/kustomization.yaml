@@ -1,0 +1,75 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Namespace
+  - namespace/namespace.yaml
+
+  # Configuration
+  - config/configmap.yaml
+  - config/secret.yaml
+  - config/tls-secret.yaml
+
+  # PostgreSQL
+  - postgres/statefulset.yaml
+  - postgres/headless-service.yaml
+
+  # Redis
+  - redis/statefulset.yaml
+  - redis/headless-service.yaml
+
+  # Application Services
+  - services/catalog/deployment.yaml
+  - services/catalog/service.yaml
+
+  - services/identity/deployment.yaml
+  - services/identity/service.yaml
+
+  - services/cart/deployment.yaml
+  - services/cart/service.yaml
+
+  - services/inventory/deployment.yaml
+  - services/inventory/service.yaml
+
+  - services/order/deployment.yaml
+  - services/order/service.yaml
+
+  - services/payment/deployment.yaml
+  - services/payment/service.yaml
+
+  - services/notification/deployment.yaml
+  - services/notification/service.yaml
+
+  - services/gateway/deployment.yaml
+  - services/gateway/service.yaml
+
+  - services/frontend/deployment.yaml
+  - services/frontend/service.yaml
+
+  # Ingress
+  - ingress/ingress.yaml
+
+  # Network Policies
+  - policies/01-default-deny.yaml
+  - policies/02-allow-dns.yaml
+  - policies/03-postgresql.yaml
+  - policies/04-redis.yaml
+  - policies/05-frontend.yaml
+  - policies/06-gateway.yaml
+  - policies/07-catalog.yaml
+  - policies/08-identity.yaml
+  - policies/09-cart.yaml
+  - policies/10-inventory.yaml
+  - policies/11-order.yaml
+  - policies/12-payment.yaml
+  - policies/13-notification.yaml
+
+  # Autoscaling
+  - autoscaling/01-gateway-hpa.yaml
+  - autoscaling/02-catalog-hpa.yaml
+  - autoscaling/03-identity-hpa.yaml
+  - autoscaling/04-cart-hpa.yaml
+  - autoscaling/05-inventory-hpa.yaml
+  - autoscaling/06-order-hpa.yaml
+  - autoscaling/07-payment-hpa.yaml
+  - autoscaling/08-frontend-hpa.yaml

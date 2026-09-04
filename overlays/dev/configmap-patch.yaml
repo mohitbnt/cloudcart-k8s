@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudcart-configmap
+  namespace: cloudcart
+
+data:
+  ENVIRONMENT: dev
+  API_BASE: https://devapi.cloudsystemonline.com
+  ALLOWED_ORIGINS: https://devshop.cloudsystemonline.com

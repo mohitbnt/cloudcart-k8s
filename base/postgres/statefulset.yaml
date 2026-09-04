@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/instance: cloudcart-postgresql-statefulset
     app.kubernetes.io/component: database
     app.kubernetes.io/part-of: cloudcart
-    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/managed-by: kustomize
   namespace: cloudcart
 spec:
   serviceName: cloudcart-postgresql-service
@@ -23,7 +23,7 @@ spec:
         app.kubernetes.io/instance: cloudcart-postgresql
         app.kubernetes.io/component: database
         app.kubernetes.io/part-of: cloudcart
-        app.kubernetes.io/managed-by: kubectl
+        app.kubernetes.io/managed-by: kustomize
     spec:
       containers:
         - name: cloudcart-postgresql-container
