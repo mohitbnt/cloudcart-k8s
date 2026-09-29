@@ -33,5 +33,5 @@ jobs:
           cd cloudcart-application
           export TAG=${{ github.sha }}
           export REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker compose -f docker-compose.yml build
-          docker compose -f docker-compose.yml push
+          docker compose -f docker-compose.yaml build
+          docker compose -f docker-compose.yaml push
