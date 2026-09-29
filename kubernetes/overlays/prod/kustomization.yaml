@@ -10,29 +10,29 @@ patches:
   - path: namespace-patch.yaml
 
 images:
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/catalog
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-catalog
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/identity
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-identity
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/cart
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-cart
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/inventory
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-inventory
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/order
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-order
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/payment
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-payment
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/notification
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-notification
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/gateway
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-gateway
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/frontend
-    newTag: prod-1.0.0
+  - name: ghcr.io/mohitbnt/cloudcart-frontend
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd

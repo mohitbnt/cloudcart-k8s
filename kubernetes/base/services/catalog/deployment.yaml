@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: cloudcart-catalog-container
-          image: public.ecr.aws/k3e1b3j2/cloudcart/catalog:1.0.0
+          image: ghcr.io/mohitbnt/cloudcart-catalog:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: cloudcart-payment-container
-          image: public.ecr.aws/k3e1b3j2/cloudcart/payment:1.0.0
+          image: ghcr.io/mohitbnt/cloudcart-payment:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

@@ -19,29 +19,29 @@ patches:
     path: ingress-patch.yaml
 
 images:
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/catalog
+  - name: ghcr.io/mohitbnt/cloudcart-catalog
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/identity
+  - name: ghcr.io/mohitbnt/cloudcart-identity
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/cart
+  - name: ghcr.io/mohitbnt/cloudcart-cart
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/inventory
+  - name: ghcr.io/mohitbnt/cloudcart-inventory
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/order
+  - name: ghcr.io/mohitbnt/cloudcart-order
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/payment
+  - name: ghcr.io/mohitbnt/cloudcart-payment
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/notification
+  - name: ghcr.io/mohitbnt/cloudcart-notification
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/gateway
+  - name: ghcr.io/mohitbnt/cloudcart-gateway
     newTag: dev-1.0.0
 
-  - name: public.ecr.aws/k3e1b3j2/cloudcart/frontend
+  - name: ghcr.io/mohitbnt/cloudcart-frontend
     newTag: dev-1.0.0
