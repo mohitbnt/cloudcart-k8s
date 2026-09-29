@@ -42,6 +42,7 @@ services:
       retries: 10
 
   catalog:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-catalog:${TAG:-latest}
     build:
       context: ./services/catalog
     env_file:
@@ -54,6 +55,7 @@ services:
         condition: service_healthy
 
   identity:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-identity:${TAG:-latest}
     build:
       context: ./services/identity
     env_file:
@@ -68,6 +70,7 @@ services:
         condition: service_healthy
 
   inventory:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-inventory:${TAG:-latest}
     build:
       context: ./services/inventory
     env_file:
@@ -80,6 +83,7 @@ services:
         condition: service_healthy
 
   payment:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-payment:${TAG:-latest}
     build:
       context: ./services/payment
     env_file:
@@ -92,6 +96,7 @@ services:
         condition: service_healthy
 
   order:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-order:${TAG:-latest}
     build:
       context: ./services/order
     env_file:
@@ -108,6 +113,7 @@ services:
         condition: service_started
 
   cart:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-cart:${TAG:-latest}
     build:
       context: ./services/cart
     env_file:
@@ -120,6 +126,7 @@ services:
         condition: service_healthy
 
   notification:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-notification:${TAG:-latest}
     build:
       context: ./services/notification
     env_file:
@@ -132,6 +139,7 @@ services:
         condition: service_healthy
 
   gateway:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-gateway:${TAG:-latest}
     build:
       context: ./gateway
     env_file:
@@ -149,6 +157,7 @@ services:
       - order
 
   frontend:
+    image: ghcr.io/${REPO_OWNER}/cloudcart-frontend:${TAG:-latest}
     build:
       context: ./frontend
     ports:
