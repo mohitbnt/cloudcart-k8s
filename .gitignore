@@ -4,6 +4,7 @@
 *.secret.yml
 secret*.yaml
 secret*.yml
+!sealed-*secret.yaml
 
 # Local environment files
 .env

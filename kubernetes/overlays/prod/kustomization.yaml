@@ -5,6 +5,7 @@ namespace: cloudcart-prod
 
 resources:
   - ../../base
+  - ./sealed-postgresql-secret.yaml
 
 patches:
   - path: namespace-patch.yaml

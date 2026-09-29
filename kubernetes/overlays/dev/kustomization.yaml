@@ -5,12 +5,12 @@ namespace: cloudcart-dev
 
 resources:
   - ../../base
+  - ./sealed-postgresql-secret.yaml
 
 patches:
   - path: namespace-patch.yaml
   - path: configmap-patch.yaml
-  - path: secret-patch.yaml
-  
+
   - target:
       group: networking.k8s.io
       version: v1
@@ -20,28 +20,28 @@ patches:
 
 images:
   - name: ghcr.io/mohitbnt/cloudcart-catalog
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-identity
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-cart
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-inventory
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-order
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-payment
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-notification
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-gateway
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 
   - name: ghcr.io/mohitbnt/cloudcart-frontend
-    newTag: dev-1.0.0
+    newTag: 163810200a511c30519ee2b0c343a384f08d6afd
