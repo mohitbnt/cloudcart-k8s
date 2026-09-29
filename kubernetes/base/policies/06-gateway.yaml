@@ -21,12 +21,11 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              app.kubernetes.io/name: ingress-nginx
-              app.kubernetes.io/instance: ingress-nginx
+              kubernetes.io/metadata.name: ingress-nginx              
           podSelector:
             matchLabels:
               app.kubernetes.io/name: ingress-nginx
-              app.kubernetes.io/instance: ingress-nginx
+              app.kubernetes.io/instance: my-ingress
       ports:
         - protocol: TCP
           port: 8000

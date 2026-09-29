@@ -76,7 +76,7 @@ spec:
     - metadata:
         name: cloudcart-postgresql-volume
       spec:
-        storageClassName: local-storage-custom
+        storageClassName: local-path
         accessModes:
           - ReadWriteOnce
         resources:
