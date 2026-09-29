@@ -31,6 +31,7 @@ jobs:
       - name: Build and push Docker image
         run: |
           cd cloudcart-application
+          cp .env.example .env
           export TAG=${{ github.sha }}
           export REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           docker compose -f docker-compose.yaml build
