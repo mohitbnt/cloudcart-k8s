@@ -1,24 +1,61 @@
-name: Buil and Push images to GHCR
+name: Build and Push images to GHCR
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cloudcart-application/frontend/**'
+      - 'cloudcart-application/gateway/**'
+      - 'cloudcart-application/services/cart/**'
+      - 'cloudcart-application/services/catalog/**'
+      - 'cloudcart-application/services/identity/**'
+      - 'cloudcart-application/services/inventory/**'
+      - 'cloudcart-application/services/notification/**'
+      - 'cloudcart-application/services/order/**'
+      - 'cloudcart-application/services/payment/**'
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push-images:
+  detect-changes-and-build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Check for the file changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'cloudcart-application/frontend/**'
+            gateway:
+              - 'cloudcart-application/gateway/**'
+            cart:
+              - 'cloudcart-application/services/cart/**'
+            catalog:
+              - 'cloudcart-application/services/catalog/**'
+            identity:
+              - 'cloudcart-application/services/identity/**'
+            inventory:
+              - 'cloudcart-application/services/inventory/**'
+            notification:
+              - 'cloudcart-application/services/notification/**'
+            order:
+              - 'cloudcart-application/services/order/**'
+            payment:
+              - 'cloudcart-application/services/payment/**'
 
-      - name: Log in to the Container registry
+      - name: Login to the Container registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -28,11 +65,194 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: "5.8.1"
+      
+      - name: Build and push Docker image and update newTag in kustomization.yaml
         run: |
           cd cloudcart-application
           cp .env.example .env
           export TAG=${{ github.sha }}
           export REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker compose -f docker-compose.yaml build
-          docker compose -f docker-compose.yaml push
+
+          # Frontend Image Build and Push
+          if [[ "${{ steps.filter.outputs.frontend }}" == "true" ]]; then
+            echo "Frontend changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build frontend
+            docker compose -f docker-compose.yaml push frontend
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-frontend=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev frontend image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Gateway Image Build and Push
+          if [[ "${{ steps.filter.outputs.gateway }}" == "true" ]]; then
+            echo "Gateway changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build gateway
+            docker compose -f docker-compose.yaml push gateway
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-gateway=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev gateway image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Cart Image Build and Push
+          if [[ "${{ steps.filter.outputs.cart }}" == "true" ]]; then
+            echo "Cart changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build cart
+            docker compose -f docker-compose.yaml push cart
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-cart=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev cart image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Catalog Image Build and Push
+          if [[ "${{ steps.filter.outputs.catalog }}" == "true" ]]; then
+            echo "Catalog changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build catalog
+            docker compose -f docker-compose.yaml push catalog
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-catalog=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev catalog image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Identity Image Build and Push
+          if [[ "${{ steps.filter.outputs.identity }}" == "true" ]]; then
+            echo "Identity changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build identity
+            docker compose -f docker-compose.yaml push identity
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-identity=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev identity image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Inventory Image Build and Push
+          if [[ "${{ steps.filter.outputs.inventory }}" == "true" ]]; then
+            echo "Inventory changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build inventory
+            docker compose -f docker-compose.yaml push inventory
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-inventory=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev inventory image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Notification Image Build and Push
+          if [[ "${{ steps.filter.outputs.notification }}" == "true" ]]; then
+            echo "Notification changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build notification
+            docker compose -f docker-compose.yaml push notification
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-notification=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev notification image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Order Image Build and Push
+          if [[ "${{ steps.filter.outputs.order }}" == "true" ]]; then
+            echo "Order changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build order
+            docker compose -f docker-compose.yaml push order
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-order=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev order image tag to ${TAG} [skip ci]"
+            git push
+          fi
+
+          # Payment Image Build and Push
+          if [[ "${{ steps.filter.outputs.payment }}" == "true" ]]; then
+            echo "Payment changed! Building and pushing image..."
+            docker compose -f docker-compose.yaml build payment
+            docker compose -f docker-compose.yaml push payment
+
+            # 3. Return back to the Git root directory to handle Kustomize tracking safely
+            cd ..
+
+            echo "Updating newTag in kustomization.yml..."
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-payment=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+
+            echo "Committing updated manifest back to Git..."
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@github.com"
+            git add kubernetes/overlays/dev/kustomization.yaml
+            git commit -m "chore(gitops): update dev payment image tag to ${TAG} [skip ci]"
+            git push
+          fi
