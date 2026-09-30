@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cloudcart-appset
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - env: prod
+            cluster: https://kubernetes.default.svc
+            revision: v1.0.0
+          - env: dev
+            cluster: https://kubernetes.default.svc
+            revision: HEAD
+  template:
+    metadata:
+      name: cloudcart-{{env}}
+    spec:
+      project: cloudcart-{{env}}
+      source:
+        repoURL: https://github.com/mohitbnt/cloudcart-k8s.git
+        targetRevision: '{{revision}}'
+        path: kubernetes/overlays/{{env}}
+      destination:
+        server: '{{cluster}}'
+        namespace: cloudcart-{{env}}
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
