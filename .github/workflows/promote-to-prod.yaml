@@ -18,7 +18,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
+      - name: Install yq
+        uses: mikefarah/yq@v4.44.3
+
       - name: Sync dev images version to prod overlay
         run: |
           DEV_DIR="kubernetes/overlays/dev"
@@ -27,17 +30,27 @@ jobs:
           # Update newTag in kustomization.yaml
           IMAGES_JSON=$(yq eval '.images' $DEV_DIR/kustomization.yaml -o json)
           yq eval ".images = $IMAGES_JSON" -i $PROD_DIR/kustomization.yaml
+      
+      - name: Update ArgoCD ApplicationSet revision for prod
+        run: |
+          APPSET_FILE="argocd/02-application-set.yaml"
+          NEW_TAG="${{ github.ref_name }}"
+
+          yq eval '(.spec.generators[0].list.elements[] | select(.env == "prod")).revision = "'"$NEW_TAG"'"' -i $APPSET_FILE
+
 
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@github.com"
-          git add kubernetes/overlays/prod/kustomization.yaml
+          git add kubernetes/overlays/prod/kustomization.yaml argocd/application-set.yaml
 
           if ! git diff --cached --exit-code; then
-            git commit -m "chore(deploy): promote dev images to production for tag ${{ github.ref_name }} [skip ci]"
-            git push origin HEAD:${{ github.ref }} --force
-          
+            git commit -m "chore(deploy): release ${{ github.ref_name }} to production [skip ci]"
+            git tag -d ${{ github.ref_name }}
+            git tag ${{ github.ref_name }}
+            git push origin main
+            git push origin ${{ github.ref_name }} --force
           else
-            echo "No changes to promote. Prod is already identical to Dev."
+            echo "Production is already up to date with this release version."
           fi
