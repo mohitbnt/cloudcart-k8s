@@ -38,7 +38,7 @@ images:
 - name: ghcr.io/mohitbnt/cloudcart-identity
   newName: 92a4562def4f7ef7082289518f9d7403320c519b
 - name: ghcr.io/mohitbnt/cloudcart-inventory
-  newTag: 163810200a511c30519ee2b0c343a384f08d6afd
+  newName: 92a4562def4f7ef7082289518f9d7403320c519b
 - name: ghcr.io/mohitbnt/cloudcart-notification
   newTag: 163810200a511c30519ee2b0c343a384f08d6afd
 - name: ghcr.io/mohitbnt/cloudcart-order
