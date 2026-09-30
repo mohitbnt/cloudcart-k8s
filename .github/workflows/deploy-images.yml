@@ -72,8 +72,7 @@ jobs:
       
       - name: Build and push Docker image and update newTag in kustomization.yaml
         run: |
-          cd cloudcart-application
-          cp .env.example .env
+          cp cloudcart-application/.env.example cloudcart-application/.env
           export TAG=${{ github.sha }}
           export REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
 
@@ -83,13 +82,12 @@ jobs:
             docker compose -f docker-compose.yaml build frontend
             docker compose -f docker-compose.yaml push frontend
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-frontend=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-frontend=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -103,13 +101,12 @@ jobs:
             docker compose -f docker-compose.yaml build gateway
             docker compose -f docker-compose.yaml push gateway
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-gateway=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-gateway=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -123,13 +120,12 @@ jobs:
             docker compose -f docker-compose.yaml build cart
             docker compose -f docker-compose.yaml push cart
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-cart=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-cart=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -143,13 +139,12 @@ jobs:
             docker compose -f docker-compose.yaml build catalog
             docker compose -f docker-compose.yaml push catalog
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-catalog=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-catalog=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -163,13 +158,12 @@ jobs:
             docker compose -f docker-compose.yaml build identity
             docker compose -f docker-compose.yaml push identity
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-identity=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-identity=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -183,13 +177,12 @@ jobs:
             docker compose -f docker-compose.yaml build inventory
             docker compose -f docker-compose.yaml push inventory
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-inventory=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-inventory=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -203,13 +196,12 @@ jobs:
             docker compose -f docker-compose.yaml build notification
             docker compose -f docker-compose.yaml push notification
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-notification=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-notification=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -223,13 +215,12 @@ jobs:
             docker compose -f docker-compose.yaml build order
             docker compose -f docker-compose.yaml push order
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-order=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-order=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
@@ -243,13 +234,12 @@ jobs:
             docker compose -f docker-compose.yaml build payment
             docker compose -f docker-compose.yaml push payment
 
-            # 3. Return back to the Git root directory to handle Kustomize tracking safely
-            cd ..
-
             echo "Updating newTag in kustomization.yml..."
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-payment=${TAG} --kustomization kubernetes/overlays/dev/kustomization.yaml
+            cd kubernetes/overlays/dev
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-payment=${TAG}
 
             echo "Committing updated manifest back to Git..."
+            cd ../../../
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@github.com"
             git add kubernetes/overlays/dev/kustomization.yaml
