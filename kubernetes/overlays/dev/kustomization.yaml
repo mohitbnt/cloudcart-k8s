@@ -18,30 +18,30 @@ patches:
     name: cloudcart-ingress
     version: v1
 
-
-
-
-
-
-
-
-
 images:
-- name: ghcr.io/mohitbnt/cloudcart-cart
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-catalog
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-frontend
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-gateway
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-identity
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-inventory
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-notification
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-order
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
-- name: ghcr.io/mohitbnt/cloudcart-payment
-  newName: 92a4562def4f7ef7082289518f9d7403320c519b
+  - name: ghcr.io/mohitbnt/cloudcart-catalog
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-identity
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-cart
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-inventory
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-order
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-payment
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-notification
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-gateway
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+
+  - name: ghcr.io/mohitbnt/cloudcart-frontend
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b

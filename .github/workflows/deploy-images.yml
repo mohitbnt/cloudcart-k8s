@@ -85,7 +85,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-frontend=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-frontend=ghcr.io/${REPO_OWNER}/cloudcart-frontend:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -105,7 +105,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-gateway=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-gateway=ghcr.io/${REPO_OWNER}/cloudcart-gateway:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -125,7 +125,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-cart=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-cart=ghcr.io/${REPO_OWNER}/cloudcart-cart:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -145,7 +145,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-catalog=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-catalog=ghcr.io/${REPO_OWNER}/cloudcart-catalog:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -165,7 +165,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-identity=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-identity=ghcr.io/${REPO_OWNER}/cloudcart-identity:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -185,7 +185,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-inventory=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-inventory=ghcr.io/${REPO_OWNER}/cloudcart-inventory:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -205,7 +205,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-notification=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-notification=ghcr.io/${REPO_OWNER}/cloudcart-notification:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -225,7 +225,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-order=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-order=ghcr.io/${REPO_OWNER}/cloudcart-order:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
@@ -245,7 +245,7 @@ jobs:
 
             echo "Updating newTag in kustomization.yml..."
             cd ../kubernetes/overlays/dev
-            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-payment=${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-payment=ghcr.io/${REPO_OWNER}/cloudcart-payment:${TAG}
 
             echo "Committing updated manifest back to Git..."
             cd ../../../
