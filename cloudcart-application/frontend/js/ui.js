@@ -41,18 +41,34 @@ export function renderFilters(onFilter) {
 }
 
 export function renderProducts(onAdd) {
-  const products = state.category === 'All'
+  const categorized = state.category === 'All'
     ? state.products
     : state.products.filter((product) => product.category === state.category);
+  const query = state.search.trim().toLocaleLowerCase();
+  const products = categorized.filter((product) =>
+    [product.name, product.description, product.category]
+      .some((value) => String(value).toLocaleLowerCase().includes(query))
+  );
+
+  $('#productCount').textContent = `${products.length} ${products.length === 1 ? 'essential' : 'essentials'}`;
 
   if (!products.length) {
-    $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">No products found.</div>';
+    $('#grid').innerHTML = '<div class="empty" style="grid-column:1/-1">No matching essentials. Try another search.</div>';
     return;
   }
 
   $('#grid').innerHTML = products.map((product) => {
     const stock = Number(product.stock);
     const stockClass = stock <= 0 ? 'out' : stock <= 5 ? 'low' : '';
+    const image = /keyboard/i.test(product.name)
+      ? 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=900&q=82'
+      : /mouse/i.test(product.name)
+        ? 'https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=900&q=82'
+        : /hub/i.test(product.name)
+          ? 'https://images.unsplash.com/photo-1625842268584-8f3296236761?auto=format&fit=crop&w=900&q=82'
+          : /headphone/i.test(product.name)
+            ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=82'
+            : '';
     const stockText = stock <= 0
       ? 'Out of stock'
       : stock <= 5
@@ -61,17 +77,25 @@ export function renderProducts(onAdd) {
 
     return `
       <article class="card">
-        <div class="pic">${escapeHtml(product.emoji || '📦')}</div>
+        <div class="pic">
+          <span class="pic-fallback" aria-hidden="true">${escapeHtml(product.emoji || '📦')}</span>
+          ${image ? `<img src="${image}" alt="${escapeHtml(product.name)}" loading="lazy">` : ''}
+          <span class="image-index" aria-hidden="true">CC / ${String(product.id).padStart(2, '0')}</span>
+        </div>
         <div class="cat">${escapeHtml(product.category).toUpperCase()}</div>
         <h3>${escapeHtml(product.name)}</h3>
         <div class="desc">${escapeHtml(product.description)}</div>
-        <div class="stock ${stockClass}">${stockText}</div>
+        <div class="stock ${stockClass}"><span class="stock-dot"></span>${stockText}</div>
         <div class="row">
           <span class="price">${money(product.price)}</span>
-          <button class="add" data-product-id="${product.id}" type="button" ${stock <= 0 ? 'disabled' : ''}>Add to cart</button>
+          <button class="add" data-product-id="${product.id}" type="button" aria-label="Add ${escapeHtml(product.name)} to cart" ${stock <= 0 ? 'disabled' : ''}><span aria-hidden="true">＋</span> Add</button>
         </div>
       </article>`;
   }).join('');
+
+  $('#grid').querySelectorAll('.pic img').forEach((imageElement) => {
+    imageElement.addEventListener('error', () => imageElement.classList.add('image-failed'), { once: true });
+  });
 
   $('#grid').querySelectorAll('[data-product-id]').forEach((button) => {
     button.addEventListener('click', () => onAdd(Number(button.dataset.productId)));

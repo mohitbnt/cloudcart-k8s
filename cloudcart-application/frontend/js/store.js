@@ -3,6 +3,7 @@ export const state = {
   cart: { items: [] },
   user: null,
   category: 'All',
+  search: '',
 };
 
 export function productById(id) {

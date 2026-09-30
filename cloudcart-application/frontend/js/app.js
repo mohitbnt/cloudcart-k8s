@@ -317,6 +317,17 @@ function bindEvents() {
   $('#exploreButton').addEventListener('click', () => $('#shop').scrollIntoView({ behavior: 'smooth' }));
   $('#heroCartButton').addEventListener('click', openCart);
   $('#aboutButton').addEventListener('click', () => $('#shop').scrollIntoView({ behavior: 'smooth' }));
+  $('#productSearch').addEventListener('input', (event) => {
+    state.search = event.target.value;
+    renderProducts(addToCart);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+      event.preventDefault();
+      $('#productSearch').focus();
+    }
+  });
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;

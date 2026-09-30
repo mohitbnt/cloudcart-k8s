@@ -5,16 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="CloudCart — modern workday essentials">
   <title>CloudCart — Good gear. Great flow.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/storefront.css">
 </head>
 <body>
+  <div class="announcement">Thoughtful picks for your everyday <span>·</span> Good things, chosen well</div>
   <header class="topbar">
     <div class="shell topbar-inner">
       <a class="logo" href="#top" aria-label="CloudCart home">cloud<span>cart</span>.</a>
       <nav class="nav" aria-label="Main navigation">
         <a href="#shop">Shop</a>
         <a href="#orders">Orders</a>
-        <a href="#about">About</a>
+        <a href="#about">Our approach</a>
       </nav>
       <div class="actions">
         <button class="pill" id="accountBtn" type="button">Sign in</button>
@@ -27,17 +32,18 @@
 
   <section class="hero">
     <div class="shell hero-grid">
-      <div>
+      <div class="hero-copy">
         <span class="eyebrow">CURATED FOR BETTER WORKDAYS</span>
         <h1>Good gear.<br><em>Great flow.</em></h1>
         <p>Thoughtfully selected essentials for your desk, your commute, and everything in between.</p>
         <div class="hero-buttons">
-          <button class="pill primary" id="exploreButton" type="button">Explore collection →</button>
-          <button class="pill" id="heroCartButton" type="button">View cart</button>
+          <button class="pill primary" id="exploreButton" type="button">Shop the collection <span aria-hidden="true">↗</span></button>
+          <button class="text-link" id="heroCartButton" type="button">View your cart <span aria-hidden="true">→</span></button>
         </div>
       </div>
       <div class="hero-art" aria-hidden="true">
-        <div class="keyboard">⌨️</div>
+        <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="" fetchpriority="high">
+        <div class="hero-caption"><span>THE EVERYDAY EDIT</span><strong>Make room for good work.</strong></div>
       </div>
     </div>
   </section>
@@ -45,10 +51,19 @@
   <main id="shop" class="shell section">
     <div class="section-head">
       <div>
-        <h2>Featured essentials</h2>
-        <p>Practical gear selected for focused work and everyday life.</p>
+        <span class="section-kicker">THE CLOUDCART COLLECTION</span>
+        <h2>Find your next favorite.</h2>
+        <p>Considered essentials, made to earn their place in your day.</p>
       </div>
+      <label class="search-wrap">
+        <span aria-hidden="true">⌕</span>
+        <input id="productSearch" type="search" placeholder="Search the collection" aria-label="Search products">
+        <kbd>/</kbd>
+      </label>
+    </div>
+    <div class="collection-toolbar">
       <div class="filters" id="filters" aria-label="Product categories"></div>
+      <span id="productCount" class="product-count" aria-live="polite"></span>
     </div>
     <div id="grid" class="grid">
       <div class="loading">Loading the collection…</div>
@@ -57,11 +72,12 @@
 
   <section class="shell banner" id="about">
     <div>
-      <strong>Built for the modern workday.</strong>
+      <span class="section-kicker">A LITTLE LESS, A LOT BETTER</span>
+      <strong>Keep what earns its place.</strong>
       <br>
       <span>Simple products. Clean design. No unnecessary noise.</span>
     </div>
-    <button class="pill" id="aboutButton" type="button">Start shopping →</button>
+    <button class="pill" id="aboutButton" type="button">Find your everyday essential <span aria-hidden="true">↗</span></button>
   </section>
 
   <section class="shell section orders" id="orders">
@@ -76,8 +92,9 @@
 
   <footer class="footer">
     <div class="shell footer-inner">
-      <span>© 2026 CloudCart</span>
-      <span>Demo storefront · Built for the CloudCart platform</span>
+      <a class="logo footer-logo" href="#top">cloud<span>cart</span>.</a>
+      <span>© 2026 CloudCart · Good gear for the everyday.</span>
+      <a href="#shop">Back to the collection ↑</a>
     </div>
   </footer>
 
