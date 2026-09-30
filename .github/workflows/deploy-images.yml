@@ -79,11 +79,12 @@ jobs:
           # Frontend Image Build and Push
           if [[ "${{ steps.filter.outputs.frontend }}" == "true" ]]; then
             echo "Frontend changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build frontend
             docker compose -f docker-compose.yaml push frontend
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-frontend=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -98,11 +99,12 @@ jobs:
           # Gateway Image Build and Push
           if [[ "${{ steps.filter.outputs.gateway }}" == "true" ]]; then
             echo "Gateway changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build gateway
             docker compose -f docker-compose.yaml push gateway
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-gateway=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -117,11 +119,12 @@ jobs:
           # Cart Image Build and Push
           if [[ "${{ steps.filter.outputs.cart }}" == "true" ]]; then
             echo "Cart changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build cart
             docker compose -f docker-compose.yaml push cart
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-cart=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -136,11 +139,12 @@ jobs:
           # Catalog Image Build and Push
           if [[ "${{ steps.filter.outputs.catalog }}" == "true" ]]; then
             echo "Catalog changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build catalog
             docker compose -f docker-compose.yaml push catalog
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-catalog=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -155,11 +159,12 @@ jobs:
           # Identity Image Build and Push
           if [[ "${{ steps.filter.outputs.identity }}" == "true" ]]; then
             echo "Identity changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build identity
             docker compose -f docker-compose.yaml push identity
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-identity=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -174,11 +179,12 @@ jobs:
           # Inventory Image Build and Push
           if [[ "${{ steps.filter.outputs.inventory }}" == "true" ]]; then
             echo "Inventory changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build inventory
             docker compose -f docker-compose.yaml push inventory
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-inventory=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -193,11 +199,12 @@ jobs:
           # Notification Image Build and Push
           if [[ "${{ steps.filter.outputs.notification }}" == "true" ]]; then
             echo "Notification changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build notification
             docker compose -f docker-compose.yaml push notification
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-notification=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -212,11 +219,12 @@ jobs:
           # Order Image Build and Push
           if [[ "${{ steps.filter.outputs.order }}" == "true" ]]; then
             echo "Order changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build order
             docker compose -f docker-compose.yaml push order
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-order=${TAG}
 
             echo "Committing updated manifest back to Git..."
@@ -231,11 +239,12 @@ jobs:
           # Payment Image Build and Push
           if [[ "${{ steps.filter.outputs.payment }}" == "true" ]]; then
             echo "Payment changed! Building and pushing image..."
+            cd cloudcart-application
             docker compose -f docker-compose.yaml build payment
             docker compose -f docker-compose.yaml push payment
 
             echo "Updating newTag in kustomization.yml..."
-            cd kubernetes/overlays/dev
+            cd ../kubernetes/overlays/dev
             kustomize edit set image ghcr.io/${REPO_OWNER}/cloudcart-payment=${TAG}
 
             echo "Committing updated manifest back to Git..."
