@@ -1,0 +1,43 @@
+name: Promote Dev Manifests to Prod
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  promote-manifests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Sync dev images version to prod overlay
+        run: |
+          DEV_DIR="kubernetes/overlays/dev"
+          PROD_DIR="kubernetes/overlays/prod"
+          
+          # Update newTag in kustomization.yaml
+          IMAGES_JSON=$(yq eval '.images' $DEV_DIR/kustomization.yaml -o json)
+          yq eval ".images = $IMAGES_JSON" -i $PROD_DIR/kustomization.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@github.com"
+          git add kubernetes/overlays/prod/kustomization.yaml
+
+          if ! git diff --cached --exit-code; then
+            git commit -m "chore(deploy): promote dev images to production for tag ${{ github.ref_name }} [skip ci]"
+            git push origin HEAD:${{ github.ref }} --force
+          
+          else
+            echo "No changes to promote. Prod is already identical to Dev."
+          fi
