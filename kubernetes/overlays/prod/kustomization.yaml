@@ -1,39 +1,28 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 namespace: cloudcart-prod
-
 resources:
   - ../../base
   - ./sealed-postgresql-secret.yaml
-
 patches:
   - path: namespace-patch.yaml
-
 images:
-  - name: ghcr.io/mohitbnt/cloudcart-catalog
-    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
-  - name: ghcr.io/mohitbnt/cloudcart-identity
-    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
   - name: ghcr.io/mohitbnt/cloudcart-cart
     newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
-  - name: ghcr.io/mohitbnt/cloudcart-inventory
+  - name: ghcr.io/mohitbnt/cloudcart-catalog
     newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
-  - name: ghcr.io/mohitbnt/cloudcart-order
-    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
-  - name: ghcr.io/mohitbnt/cloudcart-payment
-    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
-  - name: ghcr.io/mohitbnt/cloudcart-notification
-    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
+  - name: ghcr.io/mohitbnt/cloudcart-frontend
+    newName: ghcr.io/mohitbnt/cloudcart-frontend
+    newTag: 2de0807cbe53f7ce710d0321296cbcdd2eefca98
   - name: ghcr.io/mohitbnt/cloudcart-gateway
     newTag: 92a4562def4f7ef7082289518f9d7403320c519b
-
-  - name: ghcr.io/mohitbnt/cloudcart-frontend
+  - name: ghcr.io/mohitbnt/cloudcart-identity
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+  - name: ghcr.io/mohitbnt/cloudcart-inventory
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+  - name: ghcr.io/mohitbnt/cloudcart-notification
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+  - name: ghcr.io/mohitbnt/cloudcart-order
+    newTag: 92a4562def4f7ef7082289518f9d7403320c519b
+  - name: ghcr.io/mohitbnt/cloudcart-payment
     newTag: 92a4562def4f7ef7082289518f9d7403320c519b

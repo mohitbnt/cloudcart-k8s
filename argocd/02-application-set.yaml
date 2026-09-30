@@ -11,7 +11,7 @@ spec:
         elements:
           - env: prod
             cluster: https://kubernetes.default.svc
-            revision: v1.0.0
+            revision: main
           - env: dev
             cluster: https://kubernetes.default.svc
             revision: HEAD
