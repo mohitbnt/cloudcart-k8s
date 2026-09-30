@@ -3,6 +3,8 @@ kind: AppProject
 metadata:
   name: cloudcart-prod
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   description: "Cloudcart Production Environment"
   clusterResourceWhitelist:
@@ -19,6 +21,8 @@ kind: AppProject
 metadata:
   name: cloudcart-dev
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   description: "Cloudcart Development Environment"
   clusterResourceWhitelist:
