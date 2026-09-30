@@ -43,7 +43,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@github.com"
-          git add kubernetes/overlays/prod/kustomization.yaml argocd/application-set.yaml
+          git add kubernetes/overlays/prod/kustomization.yaml argocd/02-application-set.yaml
 
           if ! git diff --cached --exit-code; then
             git commit -m "chore(deploy): release ${{ github.ref_name }} to production [skip ci]"
