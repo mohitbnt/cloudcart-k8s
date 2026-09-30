@@ -42,15 +42,19 @@ jobs:
       - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@github.com"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          RELEASE_TAG="${{ github.ref_name }}"
+          
           git add kubernetes/overlays/prod/kustomization.yaml argocd/02-application-set.yaml
 
           if ! git diff --cached --exit-code; then
-            git commit -m "chore(deploy): release ${{ github.ref_name }} to production [skip ci]"
-            git tag -d ${{ github.ref_name }}
-            git tag ${{ github.ref_name }}
-            git push origin main
-            git push origin ${{ github.ref_name }} --force
+            git commit -m "chore(deploy): release $RELEASE_TAG to production [skip ci]"
+            git push origin HEAD:main
+            git tag -d "$RELEASE_TAG"
+            git tag "$RELEASE_TAG"
+            git push origin "$RELEASE_TAG" --force
           else
             echo "Production is already up to date with this release version."
           fi
+
