@@ -1,60 +1,58 @@
-name: Promote Dev Manifests to Prod
+name: Prepare Production Promotion via PR
 
 on:
-  workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'kubernetes/overlays/dev/kustomization.yaml'
 
 jobs:
-  promote-manifests:
+  prepare-prod-manifests:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
-    
+
     steps:
-      - name: Checkout repository
+      - name: Checkout PR Branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ github.head_ref }}
 
       - name: Install yq
         uses: mikefarah/yq@v4.44.3
 
-      - name: Sync dev images version to prod overlay
+      - name: Sync Dev Images to Prod Overlay
         run: |
-          DEV_DIR="kubernetes/overlays/dev"
-          PROD_DIR="kubernetes/overlays/prod"
+          DEV_KUST="kubernetes/overlays/dev/kustomization.yaml"
+          PROD_KUST="kubernetes/overlays/prod/kustomization.yaml"
           
-          # Update newTag in kustomization.yaml
-          IMAGES_JSON=$(yq eval '.images' $DEV_DIR/kustomization.yaml -o json)
-          yq eval ".images = $IMAGES_JSON" -i $PROD_DIR/kustomization.yaml
-      
-      - name: Update ArgoCD ApplicationSet revision for prod
+          # Read the images block strictly from dev
+          IMAGES_YAML=$(yq eval '.images' $DEV_KUST)
+          
+          # Inject the images block into the production kustomization file
+          export IMAGES_YAML
+          yq eval '.images = env(IMAGES_YAML)' -i $PROD_KUST
+          echo "Successfully copied image versions from Dev to Prod overlay."
+
+      - name: Ensure ApplicationSet Prod Tracks Main Branch
         run: |
           APPSET_FILE="argocd/02-application-set.yaml"
-          NEW_TAG="${{ github.ref_name }}"
+          
+          # Force the prod revision to track main branch for post-merge rollout
+          yq eval '(.spec.generators.list.elements | select(.env == "prod")).revision = "main"' -i $APPSET_FILE
+          echo "Confirmed ApplicationSet prod revision is set to main."
 
-          yq eval '(.spec.generators[0].list.elements[] | select(.env == "prod")).revision = "'"$NEW_TAG"'"' -i $APPSET_FILE
-
-
-      - name: Commit and push changes
+      - name: Commit Changes to PR Branch
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          RELEASE_TAG="${{ github.ref_name }}"
+          git config --global user.email "github-actions[bot]@://github.com"
           
           git add kubernetes/overlays/prod/kustomization.yaml argocd/02-application-set.yaml
-
+          
           if ! git diff --cached --exit-code; then
-            git commit -m "chore(deploy): release $RELEASE_TAG to production [skip ci]"
-            git push origin HEAD:main
-            git tag -d "$RELEASE_TAG"
-            git tag "$RELEASE_TAG"
-            git push origin "$RELEASE_TAG" --force
+            git commit -m "chore(gitops): auto-sync dev image versions to prod overlay [skip ci]"
+            git push origin HEAD:${{ github.head_ref }}
           else
-            echo "Production is already up to date with this release version."
+            echo "Prod overlay is already perfectly in sync with Dev."
           fi
-
