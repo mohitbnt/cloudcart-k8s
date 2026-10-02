@@ -85,7 +85,7 @@ jobs:
             
             echo "Updating local dev kustomization tag..."
             pushd kubernetes/overlays/dev > /dev/null
-            kustomize edit set image ghcr.io/${REPO_OWNER}/${image_name}=ghcr.io/${REPO_OWNER}/${image_name}:${TAG}
+            kustomize edit set image ghcr.io/${REPO_OWNER}/${image_name}=${TAG}
             popd > /dev/null
             
             SERVICES_UPDATED+=("${service_id}")
