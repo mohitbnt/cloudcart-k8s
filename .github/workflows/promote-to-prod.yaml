@@ -20,18 +20,25 @@ jobs:
       - name: Install yq
         uses: mikefarah/yq@v4.44.3
 
-      - name: Sync Dev Manifests to Production Overlay
+      - name: Sync Dev Images to Prod Overlay
         run: |
           DEV_KUST="kubernetes/overlays/dev/kustomization.yaml"
           PROD_KUST="kubernetes/overlays/prod/kustomization.yaml"
           
-          # Read the images block verifying dev
-          IMAGES_YAML=$(yq eval '.images' $DEV_KUST)
+          # 1. Get a clean list of all target image identifiers present in dev
+          IMAGE_NAMES=$(yq eval '.images[].name' $DEV_KUST)
           
-          # Inject those exact images into your production overlay
-          export IMAGES_YAML
-          yq eval '.images = env(IMAGES_YAML)' -i $PROD_KUST
-          echo "Successfully promoted dev images to prod overlay."
+          # 2. Loop through each image name, find its current newTag, and update it inside prod
+          echo "$IMAGE_NAMES" | while read -r img_name; do
+            if [ -n "$img_name" ]; then
+              # Extract the specific newTag active in dev for this exact image matching key
+              DEV_TAG=$(yq eval ".images[] | select(.name == \"$img_name\") | .newTag" $DEV_KUST)
+              
+              # Inject only that specific verified newTag into the production manifest configuration block
+              yq eval "(.images[] | select(.name == \"$img_name\")).newTag = \"$DEV_TAG\"" -i $PROD_KUST
+            fi
+          done
+          echo "Successfully promoted targeted image version tags to production cleanly."
 
       - name: Update ApplicationSet Production Target Revision
         run: |
