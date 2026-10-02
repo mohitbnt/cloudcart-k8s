@@ -48,7 +48,7 @@ jobs:
           RELEASE_VERSION="${{ github.ref_name }}"
           
           # Dynamically point the prod cluster generator to look at this new tag snapshot
-          yq eval '(.spec.generators.list.elements | select(.env == "prod")).revision = "'"$RELEASE_VERSION"'"' -i $APPSET_FILE
+          yq eval '(.spec.generators[0].list.elements | select(.env == "prod")).revision = "'"$RELEASE_VERSION"'"' -i $APPSET_FILE
           echo "Updated ApplicationSet prod target version to $RELEASE_VERSION"
 
       - name: Safe Push Back to Main and Move Tag Forward
