@@ -56,30 +56,42 @@ jobs:
       
       - name: Execute Conditional Builds and Update Local Manifests
         run: |
+          # 1. Create the .env file where docker-compose expects it
           cp cloudcart-application/.env.example cloudcart-application/.env
-          TAG=${{ github.sha }}
-          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          
+          # 2. Export variables to the runner shell environment
+          export TAG=${{ github.sha }}
+          export REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           
           SERVICES_UPDATED=()
           
+          # Function to build, push, and stage Kustomize modifications safely
           build_service() {
             local service_id=$1
             local image_name=$2
             
             echo "==== Building and pushing ${service_id} ===="
-            cd cloudcart-application
-            docker compose -f docker-compose.yaml build ${service_id}
-            docker compose -f docker-compose.yaml push ${service_id}
+            
+            # Use explicit project flags so docker compose reads the .env file perfectly
+            docker compose \
+              --file cloudcart-application/docker-compose.yaml \
+              --project-directory cloudcart-application \
+              build ${service_id}
+              
+            docker compose \
+              --file cloudcart-application/docker-compose.yaml \
+              --project-directory cloudcart-application \
+              push ${service_id}
             
             echo "Updating local dev kustomization tag..."
-            cd ../kubernetes/overlays/dev
+            pushd kubernetes/overlays/dev > /dev/null
             kustomize edit set image ghcr.io/${REPO_OWNER}/${image_name}=ghcr.io/${REPO_OWNER}/${image_name}:${TAG}
-            cd ../../../
+            popd > /dev/null
             
             SERVICES_UPDATED+=("${service_id}")
           }
 
-          # Process all changes sequentially inside this unified shell step
+          # Process all changes sequentially out of the root directory
           if [[ "${{ steps.filter.outputs.frontend }}" == "true" ]]; then build_service "frontend" "cloudcart-frontend"; fi
           if [[ "${{ steps.filter.outputs.gateway }}" == "true" ]]; then build_service "gateway" "cloudcart-gateway"; fi
           if [[ "${{ steps.filter.outputs.cart }}" == "true" ]]; then build_service "cart" "cloudcart-cart"; fi
@@ -90,8 +102,8 @@ jobs:
           if [[ "${{ steps.filter.outputs.order }}" == "true" ]]; then build_service "order" "cloudcart-order"; fi
           if [[ "${{ steps.filter.outputs.payment }}" == "true" ]]; then build_service "payment" "cloudcart-payment"; fi
 
-          # Export array to environment variable so the next step can build a clean commit message
           echo "UPDATED_LIST=${SERVICES_UPDATED[*]}" >> $GITHUB_ENV
+
 
       - name: Atomic Git Commit and Push
         run: |
