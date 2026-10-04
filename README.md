@@ -148,7 +148,6 @@ The repo is designed for a modern cluster with a CNI and default networking prot
 │   └── overlays/
 │       ├── dev/
 │       └── prod/
-├── monitoring/
 └── .gitignore
 ```
 
