@@ -1,12 +1,8 @@
 # CloudCart Kubernetes Platform
 
-Status: In progress and not yet production-complete.
-
 CloudCart is a production-style e-commerce platform designed to showcase Kubernetes, container orchestration, GitOps, ingress, service networking, and secure secret handling in a realistic multi-service setup.
 
 This repository contains both the application workload and the platform configuration used to run it in Kubernetes. The application layer lives under `cloudcart-application/`, while the Kubernetes manifests, Argo CD configuration, and GitOps automation live under `kubernetes/` and `argocd/`.
-
-The project is intentionally being expanded with additional platform capability, including monitoring, alerting, and centralized logging as future work.
 
 ## What this repo includes
 
