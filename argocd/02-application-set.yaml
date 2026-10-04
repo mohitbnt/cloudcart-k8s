@@ -12,11 +12,11 @@ spec:
           - env: prod
             cluster: https://kubernetes.default.svc
             revision: v1.1.3
-            slackChannel: prod-alerts
+            slackChannel: argoprod-cloudcart
           - env: dev
             cluster: https://kubernetes.default.svc
             revision: HEAD
-            slackChannel: dev-alerts
+            slackChannel: argodev-cloudcart
   template:
     metadata:
       name: cloudcart-{{env}}
