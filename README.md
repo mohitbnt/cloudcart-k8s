@@ -1,522 +1,340 @@
-# CloudCart — Local Kubernetes Platform
+# CloudCart Kubernetes Platform
 
-CloudCart is a production-like e-commerce microservices application deployed on a **local Kubernetes cluster**.
+CloudCart is a production-style e-commerce platform designed to showcase Kubernetes, container orchestration, GitOps, ingress, service networking, and secure secret handling in a realistic multi-service setup.
 
-This repository focuses on the **Kubernetes platform and operational configuration** around CloudCart. The application itself is included under `cloudcart-application/` as the workload used to exercise Kubernetes concepts.
+This repository contains both the application workload and the platform configuration used to run it in Kubernetes. The application layer lives under `cloudcart-application/`, while the Kubernetes manifests, Argo CD configuration, and GitOps automation live under `kubernetes/` and `argocd/`.
 
+## What this repo includes
+
+- A frontend application served by NGINX
+- A FastAPI API gateway and multiple backend microservices
+- PostgreSQL and Redis as stateful data services
+- Kustomize base manifests and environment overlays
+- Argo CD deployment automation
+- GitHub Actions for image builds and promotion
+- Network policy and ingress configuration for a production-like cluster setup
+
+---
 
 ## Architecture
-
-![CloudCart Kubernetes Architecture](diagrams/cloudcart-kubernetes-architecture.png)
-
-### High-level request flow
 
 ```text
 Users
   |
   v
-NGINX Ingress
-  |----------------------|
-  v                      v
-Frontend               Gateway
-NGINX :80             FastAPI :8000
-                         |
-             +-----------+-----------+-----------+
-             |           |           |           |
-             v           v           v           v
-          Catalog     Identity      Cart        Order
-                         |            |            |
-                         +-----+------+            +------+
-                               |                          |
-                               v                          v
-                             Redis                   Inventory
-                                                        |
-                                                     Payment
-
-PostgreSQL is used by the services that require relational persistence.
-Notification is a separate application service.
+ingress-nginx
+  |
+  +--------------------+
+  |                    |
+  v                    v
+Frontend             Gateway
+NGINX                FastAPI
+  |                    |
+  |                    +----> Catalog
+  |                    +----> Identity ----> PostgreSQL
+  |                    +----> Cart ---------> Redis
+  |                    +----> Inventory
+  |                    +----> Order --------> PostgreSQL
+  |                    +----> Payment
+  |                    +----> Notification
+  |
+  +--> static frontend assets / browser UI
 ```
 
-The logical application graph is intentionally narrowed by Kubernetes NetworkPolicies. Only explicitly required communication paths are permitted.
+The application is intentionally designed to be simple enough to reason about, while still showing Kubernetes networking, gating, and operational patterns.
 
-## Kubernetes Cluster
+---
 
-Current local cluster:
+## Cluster prerequisites
 
-| Node | Role | Kubernetes |
-|---|---|---|
-| `k8s-control-01` | control-plane | v1.36.3 |
-| `k8s-worker-01` | worker | v1.36.3 |
-| `k8s-worker-02` | worker | v1.36.3 |
+This repository assumes the following are already installed and configured on the target Kubernetes cluster.
 
-**CNI:** Cilium
+### 1. Argo CD installed via Helm
 
-The cluster is treated as a **production-like Kubernetes environment**, rather than only a disposable development cluster.
+Argo CD is expected to be running in the `argocd` namespace and is used to reconcile the environment overlays.
 
-## Project Goals
+Example installation pattern:
 
-This project demonstrates:
-
-- Containerized microservices on Kubernetes
-- Deployments and Services
-- Stateful workloads
-- Kubernetes service discovery
-- NGINX Ingress
-- Kustomize
-- Separate Dev and Prod namespaces
-- ConfigMaps and Secrets
-- Kubernetes NetworkPolicies
-- Horizontal Pod Autoscaling
-- Metrics Server
-- Production-oriented networking and operational practices
-
-The application is intentionally kept simple so the main focus remains **DevOps and Kubernetes operations**, not application development.
-
-## CloudCart Application
-
-| Component | Purpose |
-|---|---|
-| Frontend | Browser-facing web UI served through NGINX |
-| Gateway | API entry point and service routing |
-| Catalog | Product/catalog functionality |
-| Identity | Registration, login, and identity operations |
-| Cart | Shopping cart functionality |
-| Inventory | Inventory operations |
-| Order | Order creation and order-related operations |
-| Payment | Payment simulation |
-| Notification | Notification-related functionality |
-| PostgreSQL | Persistent relational application data |
-| Redis | Session/cart state |
-
-Application source and container definitions are under:
-
-```text
-cloudcart-application/
+```bash
+helm repo add argo https://argoproj.github.io/argo-helm
+helm repo update
+helm install argocd argo/argo-cd -n argocd --create-namespace
 ```
 
-# Repository Structure
+This repo includes:
+
+- `bootstrap.yaml` to bootstrap the root Argo CD application
+- `argocd/01-projects.yaml` for the dev/prod AppProjects
+- `argocd/02-application-set.yaml` for environment synchronization
+
+### 2. Sealed Secrets enabled for secret management
+
+This project assumes SealedSecrets is in place for sensitive values such as DB credentials and app secrets.
+
+Example installation pattern:
+
+```bash
+helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+helm repo update
+helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system
+```
+
+Sealed secret YAML files already exist in overlays such as:
+
+- `kubernetes/overlays/dev/sealed-postgresql-secret.yaml`
+- `kubernetes/overlays/prod/sealed-postgresql-secret.yaml`
+
+This keeps real secret material out of Git while still allowing secure reconciliation into the cluster.
+
+### 3. Ingress controller installed via Helm
+
+The cluster uses `ingress-nginx` as the external ingress controller.
+
+Example installation pattern:
+
+```bash
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
+```
+
+The ingress configuration is defined in:
+
+- `kubernetes/base/ingress/ingress.yaml`
+- `kubernetes/overlays/dev/ingress-patch.yaml`
+
+### 4. StorageClass available for local workloads
+
+The environment is expected to provide the `rancher.io/local-path` StorageClass for PVC-backed workload storage.
+
+Example validation:
+
+```bash
+kubectl get storageclass
+kubectl get sc
+```
+
+This is important for PostgreSQL and any stateful components that need persistent storage.
+
+### 5. Kubernetes networking and CNI baseline
+
+The repo is designed for a modern cluster with a CNI and default networking protections, and it explicitly uses NetworkPolicy examples for least-privilege communication.
+
+---
+
+## Repository layout
 
 ```text
 .
 ├── README.md
-├── base/
-│   ├── autoscaling/
-│   ├── config/
-│   ├── ingress/
-│   ├── namespace/
-│   ├── policies/
-│   ├── postgres/
-│   ├── redis/
-│   ├── services/
-│   └── kustomization.yaml
+├── bootstrap.yaml
+├── .github/
+│   └── workflows/
+│       ├── deploy-images.yaml
+│       └── promote-to-prod.yaml
+├── argocd/
+│   ├── 01-projects.yaml
+│   └── 02-application-set.yaml
 ├── cloudcart-application/
+│   ├── .env.example
+│   ├── docker-compose.yaml
 │   ├── README.md
-│   ├── compose.production.yaml
 │   ├── frontend/
 │   ├── gateway/
 │   └── services/
 ├── diagrams/
-├── kustomization.yaml
-└── overlays/
-    ├── dev/
-    │   ├── configmap-patch.yaml
-    │   ├── ingress-patch.yaml
-    │   ├── kustomization.yaml
-    │   ├── namespace-patch.yaml
-    │   └── secret-patch.yaml
-    └── prod/
-        ├── kustomization.yaml
-        └── namespace-patch.yaml
+├── kubernetes/
+│   ├── base/
+│   └── overlays/
+│       ├── dev/
+│       └── prod/
+├── monitoring/
+└── .gitignore
 ```
 
-## Kustomize Architecture
+The actual Kubernetes resources are organized as:
 
-```text
-                    base/
-                      |
-             +--------+--------+
-             |                 |
-             v                 v
-        overlays/dev      overlays/prod
-             |                 |
-             v                 v
-       cloudcart-dev      cloudcart-prod
-```
+- `kubernetes/base` for shared manifests
+- `kubernetes/overlays/dev` for dev environment overrides
+- `kubernetes/overlays/prod` for production environment overrides
 
-The `base/` directory contains the reusable, production-like Kubernetes configuration. Overlays provide environment-specific changes.
+---
 
-### Base
+## Application components
 
-Contains:
+| Component | Role |
+|---|---|
+| Frontend | Browser-facing storefront UI |
+| Gateway | API entry point and proxy layer |
+| Catalog | Product/catalog logic |
+| Identity | Login, registration, session handling |
+| Cart | Cart and session state operations |
+| Inventory | Inventory validation |
+| Order | Order orchestration |
+| Payment | Payment simulation |
+| Notification | Notification workflow |
+| PostgreSQL | Persistent relational data |
+| Redis | Session and cart state |
 
-- Application Deployments
-- Services
-- PostgreSQL
-- Redis
-- Ingress
-- ConfigMap
-- Secret
-- TLS Secret
-- NetworkPolicies
-- HPAs
+---
 
-The base remains complete and deployable.
+## GitOps and release flow
 
-### Dev Overlay
-
-The Dev overlay applies environment-specific configuration including:
-
-- `cloudcart-dev` namespace
-- Dev storefront/API hostnames
-- Dev environment settings
-- Dev database configuration
-- Dev image tags
-
-### Prod Overlay
-
-The Prod overlay applies:
-
-- `cloudcart-prod` namespace
-- Production image tags
-- Production namespace identity
-
-## Namespaces
-
-```text
-cloudcart-dev
-cloudcart-prod
-```
-
-Environment separation is provided by namespaces rather than resource name prefixes/suffixes.
-
-Namespace identity uses labels such as:
-
-```yaml
-app.kubernetes.io/name: cloudcart
-app.kubernetes.io/instance: cloudcart-dev
-app.kubernetes.io/component: namespace
-app.kubernetes.io/part-of: cloudcart
-app.kubernetes.io/managed-by: kustomize
-```
-
-Prod uses `cloudcart-prod` as the instance label.
-
-# Networking
-
-## Ingress
-
-NGINX Ingress Controller provides the external HTTP/HTTPS entry point:
-
-```text
-Browser
-   |
-   v
-NGINX Ingress Controller
-   |
-   +----> Frontend Service :80
-   |
-   +----> Gateway Service :8000
-```
-
-### Dev
-
-```text
-devshop.cloudsystemonline.com
-devapi.cloudsystemonline.com
-```
-
-### Production
-
-```text
-shop.cloudsystemonline.com
-api.cloudsystemonline.com
-```
-
-## Internal Service Discovery
-
-CloudCart services communicate through Kubernetes Services and internal DNS.
-
-Examples:
-
-```text
-cloudcart-gateway-service:8000
-cloudcart-catalog-service:8000
-cloudcart-identity-service:8000
-cloudcart-cart-service:8000
-cloudcart-order-service:8000
-cloudcart-inventory-service:8000
-cloudcart-payment-service:8000
-cloudcart-notification-service:8000
-cloudcart-postgresql-service:5432
-cloudcart-redis-service:6379
-```
-
-## NetworkPolicies
-
-Network security follows a **default-deny** model.
-
-```text
-Default Deny
-     |
-     +---- DNS allowance
-     |
-     +---- Ingress -> Frontend
-     |
-     +---- Ingress -> Gateway
-     |
-     +---- Gateway -> application services
-     |
-     +---- Services -> required data stores
-```
-
-Policies currently cover:
-
-```text
-01-default-deny
-02-allow-dns
-03-postgresql
-04-redis
-05-frontend
-06-gateway
-07-catalog
-08-identity
-09-cart
-10-inventory
-11-order
-12-payment
-13-notification
-```
-
-The intended trust graph is:
-
-```text
-Ingress Controller
-       |
-       +----> Frontend
-       |
-       +----> Gateway
-                 |
-                 +----> Catalog
-                 +----> Identity ----> PostgreSQL
-                 |             |
-                 |             +----> Redis
-                 |
-                 +----> Cart ---------> Redis
-                 |
-                 +----> Order
-                           |
-                           +----> PostgreSQL
-                           +----> Inventory
-                           +----> Payment
-```
-
-Only the required database/cache consumers are allowed to connect to PostgreSQL and Redis.
-
-DNS access is explicitly allowed to CoreDNS.
-
-> **Operational note:** NetworkPolicies control traffic to the actual Pod ports. For example, the CloudCart Gateway listens on TCP `8000`, so its policy must permit TCP `8000` from the allowed Ingress Controller pods.
-
-# Configuration
-
-## ConfigMap
-
-Non-sensitive runtime configuration is maintained in:
-
-```text
-base/config/configmap.yaml
-```
-
-Environment-specific values are patched by the overlays.
-
-## Secret
-
-Sensitive database configuration is maintained through:
-
-```text
-base/config/secret.yaml
-```
-
-Environment-specific database settings are overridden in the Dev overlay.
-
-> Real production credentials should not be committed to Git. A dedicated secret-management solution would be appropriate for a real production platform.
-
-## TLS
-
-TLS configuration is maintained in:
-
-```text
-base/config/tls-secret.yaml
-```
-
-Ingress uses TLS for the browser-facing hostnames.
-
-# Stateful Workloads
-
-## PostgreSQL
-
-```text
-StatefulSet
-    |
-    +---- Headless Service
-    |
-    +---- TCP/5432
-```
-
-PostgreSQL stores persistent business/application data.
-
-## Redis
-
-```text
-StatefulSet
-    |
-    +---- Headless Service
-    |
-    +---- TCP/6379
-```
-
-Redis is used for session/cart-related state.
-
-The application therefore separates:
-
-```text
-Stateless
-  ├── Frontend
-  ├── Gateway
-  ├── Catalog
-  ├── Identity
-  ├── Cart
-  ├── Inventory
-  ├── Order
-  ├── Payment
-  └── Notification
-
-Stateful
-  ├── PostgreSQL
-  └── Redis
-```
-
-# Autoscaling
-
-HPAs are configured for:
-
-- Gateway
-- Catalog
-- Identity
-- Cart
-- Inventory
-- Order
-- Payment
-- Frontend
-
-The HPAs use the Kubernetes **Metrics Server**.
-
-PostgreSQL, Redis, and Notification do not currently use HPA.
-
-# Deployment
-
-## Render the Base
+This repository uses Argo CD as the reconciliation engine and GitHub Actions for image publishing.
+
+### Image build and dev promotion
+
+The workflow in `.github/workflows/deploy-images.yaml` does the following:
+
+1. Detects changed service directories
+2. Builds changed images with Docker Compose
+3. Pushes them to GHCR
+4. Updates the dev overlay image tags using Kustomize
+5. Commits the updated manifest back to the repo
+
+This allows Argo CD to deploy the updated dev environment automatically.
+
+### Production promotion
+
+The workflow in `.github/workflows/promote-to-prod.yaml` does the following:
+
+1. Reads the current image tags from the dev overlay
+2. Propagates those values into the prod overlay
+3. Updates the prod target revision in `argocd/02-application-set.yaml`
+4. Forces the release tag to point to the final production state
+
+This is the main promotion path for the repo.
+
+---
+
+## Local application startup
+
+The app can be run locally with Docker Compose before or alongside Kubernetes testing.
+
+### 1. Prepare environment file
 
 ```bash
-kubectl kustomize base
+cp cloudcart-application/.env.example cloudcart-application/.env
 ```
 
-## Render Dev
+### 2. Start the stack
 
 ```bash
-kubectl kustomize overlays/dev
+docker compose --file cloudcart-application/docker-compose.yaml --project-directory cloudcart-application up -d
 ```
 
-## Render Prod
+### 3. Verify availability
 
 ```bash
-kubectl kustomize overlays/prod
+curl http://localhost
+curl http://localhost/api/health
 ```
 
-## Apply Dev
+The frontend is served by NGINX and proxied to the gateway API layer. The gateway health endpoint is available at `/health`.
+
+---
+
+## Kubernetes deployment
+
+### Render manifests
 
 ```bash
-kubectl apply -k overlays/dev
+kubectl kustomize kubernetes/overlays/dev
+kubectl kustomize kubernetes/overlays/prod
 ```
 
-## Apply Prod
+### Apply dev environment
 
 ```bash
-kubectl apply -k overlays/prod
+kubectl apply -k kubernetes/overlays/dev
 ```
 
-# Verification
+### Apply prod environment
 
-### Nodes
+```bash
+kubectl apply -k kubernetes/overlays/prod
+```
+
+### Validate core resources
 
 ```bash
 kubectl get nodes
+kubectl get storageclass
+kubectl get pods -n cloudcart-dev
+kubectl get svc -n cloudcart-dev
+kubectl get ingress -n cloudcart-dev
+kubectl get hpa -n cloudcart-dev
+kubectl get networkpolicy -n cloudcart-dev
 ```
 
-### Pods
+---
 
-```bash
-kubectl -n cloudcart-dev get pods
-kubectl -n cloudcart-prod get pods
-```
+## Network and security model
 
-### Services
+The platform intentionally follows a least-privilege model using NetworkPolicies.
 
-```bash
-kubectl -n cloudcart-dev get svc
-```
+Important patterns in this repo:
 
-### Ingress
+- default deny for pod-to-pod traffic
+- explicit DNS access allowance
+- ingress allowed only to selected frontend/gateway services
+- service-to-service access limited to required data paths
+- backend access to PostgreSQL and Redis restricted to the services that need it
 
-```bash
-kubectl -n cloudcart-dev get ingress
-```
+This is one of the main operational themes of the repo.
 
-### HPA
+---
 
-```bash
-kubectl -n cloudcart-dev get hpa
-```
+## Secret and configuration model
 
-### NetworkPolicies
+### Configuration
 
-```bash
-kubectl -n cloudcart-dev get networkpolicy
-```
+Non-sensitive settings are kept in Kustomize-managed config and overlay patches.
 
-# Operational Validation Checklist
+### Secrets
 
-### Cluster
+Sensitive values are managed with SealedSecrets rather than plain YAML secrets in Git.
 
-- [x] All three nodes are Ready
-- [x] CoreDNS access is explicitly allowed
-- [x] Cilium is used as the CNI
-- [x] Metrics Server is available
+This keeps the repo safe while still letting Argo CD reconcile sensitive data into the target cluster.
 
-### Application
+---
 
-- [x] Application workloads are deployed
-- [x] Services have been validated
-- [x] Frontend is reachable
-- [x] API Gateway is reachable
-- [x] Product listing works
-- [x] Login works
-- [x] Core cart/order flow is functional
+## Deployment requirements checklist
 
-### Data
+Before using this repo in a cluster, make sure the following are true:
 
-- [x] PostgreSQL is running
-- [x] Redis is running
-- [x] Required application-to-data paths are allowed
+- [ ] Kubernetes cluster is up and healthy
+- [ ] `rancher.io/local-path` StorageClass exists
+- [ ] `ingress-nginx` is installed via Helm
+- [ ] Argo CD is installed via Helm in `argocd`
+- [ ] SealedSecrets controller is installed and working
+- [ ] GitHub Actions can push to GHCR
+- [ ] App and overlay repos are reachable by Argo CD
 
-### Networking
+---
 
-- [x] Ingress routing works
-- [x] HTTP/HTTPS routing works
-- [x] Default-deny NetworkPolicy is enabled
-- [x] DNS traffic is explicitly allowed
-- [x] Service-to-service access is explicitly restricted
+## Operational notes
 
-### Scaling
+- The application is intentionally kept relatively lightweight so the focus stays on platform operations, not app complexity.
+- The repo is designed to model a production-like Kubernetes workflow rather than a toy demo-only cluster.
+- The repo supports both local Docker Compose testing and cluster-based GitOps deployment.
+- Frontend, gateway, and service APIs are intentionally environment-driven so the same images can be promoted without rebuilds for simple configuration changes.
+
+---
+
+## Summary
+
+This repository demonstrates a complete GitOps-driven microservice platform built around:
+
+- Kubernetes manifests and overlays
+- Argo CD synchronization
+- Helm-based platform prerequisites
+- SealedSecrets for secret handling
+- ingress-nginx for external routing
+- local-path storage for PVC-backed workloads
+- GitHub Actions for image promotion and delivery
+
+It is a strong example of a real-world platform workflow for a small but realistic cloud-native application.
 
 - [x] Metrics Server provides resource metrics
 - [x] HPAs are configured for the main application workloads
